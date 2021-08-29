@@ -16,9 +16,9 @@ func main() {
 	httpClient := http.DefaultClient
 
 	c := Client{url, "test-api", httpClient}
-	markets, err := c.getMarkets()
+	orderBook, err := c.getOrderBook("BTC-XMR")
 	if err != nil {
 		fmt.Printf("err = %+v\n", err)
 	}
-	fmt.Printf("markets = %+v\n", markets)
+	fmt.Printf("orderBook = %+v\n", orderBook)
 }
