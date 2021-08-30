@@ -13,7 +13,7 @@ type Client struct {
 	httpClient *http.Client
 }
 
-func (c *Client) getMarkets() (*Market, error) {
+func (c *Client) getMarkets() (Market, error) {
 	url := c.BaseURL.String() + "/markets"
 	req, err := http.NewRequest("GET", url, nil)
 
@@ -34,15 +34,15 @@ func (c *Client) getMarkets() (*Market, error) {
 	var markets Market
 	err = json.Unmarshal(body, &markets)
 
-	return &markets, err
+	return markets, err
 }
 
-func (c *Client) getOrderBook(market string) (*OrderBook, error) {
+func (c *Client) getOrderBook(market string) (OrderBook, error) {
 	url := c.BaseURL.String() + "/orders/" + market
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
-		return nil, err
+		return OrderBook{}, err
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -50,7 +50,7 @@ func (c *Client) getOrderBook(market string) (*OrderBook, error) {
 	resp, err := c.httpClient.Do(req)
 
 	if err != nil {
-		return nil, err
+		return OrderBook{}, err
 	}
 
 	// Unmarshal the buy and sell to rawMssage that is later converted to string for orderBook
@@ -69,15 +69,15 @@ func (c *Client) getOrderBook(market string) (*OrderBook, error) {
 	orderBook.Sell = string(tempBook.Sell)
 	orderBook.Success = tempBook.Success
 
-	return &orderBook, err
+	return orderBook, err
 }
 
-func (c *Client) getTicker(market string) (*Ticker, error) {
+func (c *Client) getTicker(market string) (Ticker, error) {
 	url := c.BaseURL.String() + "/ticker/" + market
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
-		return nil, err
+		return Ticker{}, err
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -85,11 +85,11 @@ func (c *Client) getTicker(market string) (*Ticker, error) {
 	resp, err := c.httpClient.Do(req)
 
 	if err != nil {
-		return nil, err
+		return Ticker{}, err
 	}
 
 	defer resp.Body.Close()
-	var ticker *Ticker
+	var ticker Ticker
 	body, _ := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &ticker)
 	return ticker, err
