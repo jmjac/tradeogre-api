@@ -14,7 +14,7 @@ type Client struct {
 }
 
 func (c *Client) getMarkets() (*Market, error) {
-	url := c.BaseURL.String() + "markets"
+	url := c.BaseURL.String() + "/markets"
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
@@ -30,15 +30,15 @@ func (c *Client) getMarkets() (*Market, error) {
 	}
 
 	defer resp.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	body, _ := ioutil.ReadAll(resp.Body)
 	var markets Market
-	err = json.Unmarshal(bodyBytes, &markets)
+	err = json.Unmarshal(body, &markets)
 
 	return &markets, err
 }
 
 func (c *Client) getOrderBook(market string) (*OrderBook, error) {
-	url := c.BaseURL.String() + "orders/" + market
+	url := c.BaseURL.String() + "/orders/" + market
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
@@ -61,8 +61,8 @@ func (c *Client) getOrderBook(market string) (*OrderBook, error) {
 	}
 
 	defer resp.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	err = json.Unmarshal(bodyBytes, &tempBook)
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &tempBook)
 
 	var orderBook OrderBook
 	orderBook.Buy = string(tempBook.Buy)
@@ -70,4 +70,27 @@ func (c *Client) getOrderBook(market string) (*OrderBook, error) {
 	orderBook.Success = tempBook.Success
 
 	return &orderBook, err
+}
+
+func (c *Client) getTicker(market string) (*Ticker, error) {
+	url := c.BaseURL.String() + "/ticker/" + market
+	req, err := http.NewRequest("GET", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("USer-Agent", c.UserAgent)
+	resp, err := c.httpClient.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	var ticker *Ticker
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &ticker)
+	return ticker, err
 }

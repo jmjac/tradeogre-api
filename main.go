@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	url, err := url.Parse("https://tradeogre.com/api/v1/")
+	url, err := url.Parse("https://tradeogre.com/api/v1")
 	if err != nil {
 		fmt.Printf("err = %+v\n", err)
 	}
@@ -16,9 +16,9 @@ func main() {
 	httpClient := http.DefaultClient
 
 	c := Client{url, "test-api", httpClient}
-	orderBook, err := c.getOrderBook("BTC-XMR")
+	ticker, err := c.getTicker("BTC-XMR")
 	if err != nil {
 		fmt.Printf("err = %+v\n", err)
 	}
-	fmt.Printf("orderBook = %+v\n", orderBook)
+	fmt.Printf("ticker = %+v\n", ticker)
 }
