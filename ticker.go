@@ -2,7 +2,7 @@ package main
 
 type Ticker struct {
 	Success      bool   `json:"success"`
-	Initialprice string `json:"initialprice"`
+	InitialPrice string `json:"initialprice"`
 	Price        string `json:"price"`
 	High         string `json:"high"`
 	Low          string `json:"low"`
