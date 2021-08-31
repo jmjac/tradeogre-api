@@ -2,19 +2,20 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 )
 
-type Client struct {
+type TradeOgre struct {
 	BaseURL    *url.URL
 	UserAgent  string
 	httpClient *http.Client
 }
 
-func (c *Client) getMarkets() (Market, error) {
-	url := c.BaseURL.String() + "/markets"
+func (t *TradeOgre) newRequest(method, path string) (*http.Request, error) {
+	url := t.BaseURL.String() + path
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
@@ -22,9 +23,17 @@ func (c *Client) getMarkets() (Market, error) {
 	}
 
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", c.UserAgent)
+	req.Header.Set("User-Agent", t.UserAgent)
+	return req, err
+}
 
-	resp, err := c.httpClient.Do(req)
+func (t *TradeOgre) getMarkets() (Market, error) {
+	req, err := t.newRequest("GET", "/markets")
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := t.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -37,23 +46,18 @@ func (c *Client) getMarkets() (Market, error) {
 	return markets, err
 }
 
-func (c *Client) getOrderBook(market string) (OrderBook, error) {
-	url := c.BaseURL.String() + "/orders/" + market
-	req, err := http.NewRequest("GET", url, nil)
-
+func (t *TradeOgre) getOrderBook(market string) (OrderBook, error) {
+	req, err := t.newRequest("GET", "/orders/"+market)
 	if err != nil {
 		return OrderBook{}, err
 	}
 
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", c.UserAgent)
-	resp, err := c.httpClient.Do(req)
-
+	resp, err := t.httpClient.Do(req)
 	if err != nil {
 		return OrderBook{}, err
 	}
 
-	// Unmarshal the buy and sell to rawMssage that is later converted to string for orderBook
+	// Unmarshal the buy and sell to rawMessage that is later converted to string for orderBook
 	var tempBook struct {
 		Success string          `json:"success"`
 		Buy     json.RawMessage `json:"buy"`
@@ -72,18 +76,13 @@ func (c *Client) getOrderBook(market string) (OrderBook, error) {
 	return orderBook, err
 }
 
-func (c *Client) getTicker(market string) (Ticker, error) {
-	url := c.BaseURL.String() + "/ticker/" + market
-	req, err := http.NewRequest("GET", url, nil)
-
+func (t *TradeOgre) getTicker(market string) (Ticker, error) {
+	req, err := t.newRequest("GET", "/ticker/"+market)
 	if err != nil {
 		return Ticker{}, err
 	}
 
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("USer-Agent", c.UserAgent)
-	resp, err := c.httpClient.Do(req)
-
+	resp, err := t.httpClient.Do(req)
 	if err != nil {
 		return Ticker{}, err
 	}
@@ -91,6 +90,25 @@ func (c *Client) getTicker(market string) (Ticker, error) {
 	defer resp.Body.Close()
 	var ticker Ticker
 	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Printf("body = %+v\n", string(body))
 	err = json.Unmarshal(body, &ticker)
 	return ticker, err
+}
+
+func (t *TradeOgre) getTradeHistory(market string) (TradeHistory, error) {
+	req, err := t.newRequest("GET", "/history/"+market)
+	if err != nil {
+		return TradeHistory{}, nil
+	}
+
+	resp, err := t.httpClient.Do(req)
+	if err != nil {
+		return TradeHistory{}, nil
+	}
+
+	defer resp.Body.Close()
+	var tradeHistory TradeHistory
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &tradeHistory)
+	return tradeHistory, err
 }
