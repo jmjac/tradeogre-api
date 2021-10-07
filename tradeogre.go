@@ -1,4 +1,4 @@
-package main
+package tradeogreapi
 
 import (
 	"encoding/json"
@@ -9,13 +9,18 @@ import (
 )
 
 type TradeOgre struct {
-	BaseURL    *url.URL
-	UserAgent  string
+	baseURL    *url.URL
 	httpClient *http.Client
 }
 
+func New() (*TradeOgre, error) {
+	url, err := url.Parse("https://tradeogre.com/api/v1")
+	t := &TradeOgre{url, http.DefaultClient}
+	return t, err
+}
+
 func (t *TradeOgre) newRequest(method, path string) (*http.Request, error) {
-	url := t.BaseURL.String() + path
+	url := t.baseURL.String() + path
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
@@ -23,11 +28,11 @@ func (t *TradeOgre) newRequest(method, path string) (*http.Request, error) {
 	}
 
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", t.UserAgent)
 	return req, err
 }
 
-func (t *TradeOgre) getMarkets() (Market, error) {
+// ListMarkets returns tickers and prices for all tickers on tradeogre
+func (t *TradeOgre) ListMarkets() (market, error) {
 	req, err := t.newRequest("GET", "/markets")
 	if err != nil {
 		return nil, err
@@ -40,21 +45,21 @@ func (t *TradeOgre) getMarkets() (Market, error) {
 
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	var markets Market
+	var markets market
 	err = json.Unmarshal(body, &markets)
 
 	return markets, err
 }
 
-func (t *TradeOgre) getOrderBook(market string) (OrderBook, error) {
+func (t *TradeOgre) GetOrderBook(market string) (orderBook, error) {
 	req, err := t.newRequest("GET", "/orders/"+market)
 	if err != nil {
-		return OrderBook{}, err
+		return orderBook{}, err
 	}
 
 	resp, err := t.httpClient.Do(req)
 	if err != nil {
-		return OrderBook{}, err
+		return orderBook{}, err
 	}
 
 	// Unmarshal the buy and sell to rawMessage that is later converted to string for orderBook
@@ -62,53 +67,54 @@ func (t *TradeOgre) getOrderBook(market string) (OrderBook, error) {
 		Success string          `json:"success"`
 		Buy     json.RawMessage `json:"buy"`
 		Sell    json.RawMessage `json:"sell"`
+		this    json.Number     `json:"this"`
 	}
 
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &tempBook)
 
-	var orderBook OrderBook
-	orderBook.Buy = string(tempBook.Buy)
-	orderBook.Sell = string(tempBook.Sell)
-	orderBook.Success = tempBook.Success
+	var ob orderBook
+	ob.Buy = string(tempBook.Buy)
+	ob.Sell = string(tempBook.Sell)
+	ob.Success = tempBook.Success
 
-	return orderBook, err
+	return ob, err
 }
 
-func (t *TradeOgre) getTicker(market string) (Ticker, error) {
+func (t *TradeOgre) GetTicker(market string) (ticker, error) {
 	req, err := t.newRequest("GET", "/ticker/"+market)
 	if err != nil {
-		return Ticker{}, err
+		return ticker{}, err
 	}
 
 	resp, err := t.httpClient.Do(req)
 	if err != nil {
-		return Ticker{}, err
+		return ticker{}, err
 	}
 
 	defer resp.Body.Close()
-	var ticker Ticker
+	var tick ticker
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Printf("body = %+v\n", string(body))
-	err = json.Unmarshal(body, &ticker)
-	return ticker, err
+	err = json.Unmarshal(body, &tick)
+	return tick, err
 }
 
-func (t *TradeOgre) getTradeHistory(market string) (TradeHistory, error) {
+func (t *TradeOgre) GetTradeHistory(market string) (tradeHistory, error) {
 	req, err := t.newRequest("GET", "/history/"+market)
 	if err != nil {
-		return TradeHistory{}, nil
+		return tradeHistory{}, nil
 	}
 
 	resp, err := t.httpClient.Do(req)
 	if err != nil {
-		return TradeHistory{}, nil
+		return tradeHistory{}, nil
 	}
 
 	defer resp.Body.Close()
-	var tradeHistory TradeHistory
+	var th tradeHistory
 	body, _ := ioutil.ReadAll(resp.Body)
-	err = json.Unmarshal(body, &tradeHistory)
-	return tradeHistory, err
+	err = json.Unmarshal(body, &th)
+	return th, err
 }

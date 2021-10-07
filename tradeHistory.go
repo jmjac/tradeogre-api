@@ -1,8 +1,8 @@
-package main
+package tradeogreapi
 
-type TradeHistory []TradeHistoryValue
+type tradeHistory []tradeHistoryValue
 
-type TradeHistoryValue struct {
+type tradeHistoryValue struct {
 	Date     int64  `json:"date"`
 	Type     string `json:"type"`
 	Price    string `json:"price"`

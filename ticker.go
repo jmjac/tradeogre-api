@@ -1,6 +1,6 @@
-package main
+package tradeogreapi
 
-type Ticker struct {
+type ticker struct {
 	Success      bool   `json:"success"`
 	InitialPrice string `json:"initialprice"`
 	Price        string `json:"price"`
