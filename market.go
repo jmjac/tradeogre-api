@@ -1,8 +1,8 @@
 package tradeogreapi
 
-type market []map[string]marketValue
+type MarketsMap []map[string]Market
 
-type marketValue struct {
+type Market struct {
 	InitialPrice float64 `json:"initialprice,string"`
 	Price        float64 `json:"price,string"`
 	High         float64 `json:"high,string"`

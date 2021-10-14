@@ -1,12 +1,12 @@
 package tradeogreapi
 
-type ticker struct {
-	Success      bool   `json:"success"`
-	InitialPrice string `json:"initialprice"`
-	Price        string `json:"price"`
-	High         string `json:"high"`
-	Low          string `json:"low"`
-	Volume       string `json:"volume"`
-	Bid          string `json:"bid"`
-	Ask          string `json:"ask"`
+type Ticker struct {
+	Success      bool    `json:"success"`
+	InitialPrice float64 `json:"initialprice,string"`
+	Price        float64 `json:"price,string"`
+	High         float64 `json:"high,string"`
+	Low          float64 `json:"low,string"`
+	Volume       float64 `json:"volume,string"`
+	Bid          float64 `json:"bid,string"`
+	Ask          float64 `json:"ask,string"`
 }

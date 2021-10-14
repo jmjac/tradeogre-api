@@ -1,8 +1,7 @@
 package tradeogreapi
 
-//TODO: convert buy and sell to float64
-type orderBook struct {
-	Success string `json:"success"`
-	Buy     string `json:"buy"`
-	Sell    string `json:"sell"`
+type OrderBook struct {
+	Success bool              `json:"success,string"`
+	Buy     map[string]string `json:"buy"`
+	Sell    map[string]string `json:"sell"`
 }

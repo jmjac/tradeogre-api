@@ -1,10 +1,10 @@
 package tradeogreapi
 
-type tradeHistory []tradeHistoryValue
+type TradeHistory []tradeHistoryValue
 
 type tradeHistoryValue struct {
-	Date     int64  `json:"date"`
-	Type     string `json:"type"`
-	Price    string `json:"price"`
-	Quantity string `json:"quantity"`
+	Date     int64   `json:"date"`
+	Type     string  `json:"type"`
+	Price    float64 `json:"price,string"`
+	Quantity float64 `json:"quantity,string"`
 }
