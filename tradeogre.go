@@ -3,26 +3,25 @@ package tradeogreapi
 import (
 	"encoding/json"
 	"net/http"
-	"net/url"
 )
 
 type TradeOgre struct {
-	baseURL    *url.URL
+	baseURL    string
 	httpClient *http.Client
 }
 
 //New creates new TradeOgre object
-func New(client *http.Client) (*TradeOgre, error) {
+func New(client *http.Client) *TradeOgre {
 	if client == nil {
 		client = http.DefaultClient
 	}
-	url, err := url.Parse("https://tradeogre.com/api/v1")
+	url := "https://tradeogre.com/api/v1"
 	t := &TradeOgre{url, client}
-	return t, err
+	return t
 }
 
 func (t *TradeOgre) newRequest(method, path string) (*http.Request, error) {
-	url := t.baseURL.String() + path
+	url := t.baseURL + path
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
