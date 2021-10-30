@@ -1,4 +1,4 @@
-[![Go](https://github.com/jmjac/tradeogre-api/actions/workflows/go.yml/badge.svg)](https://github.com/jmjac/tradeogre-api/actions/workflows/go.yml)
+[![Tests](https://github.com/jmjac/tradeogre-api/actions/workflows/tests.yml/badge.svg)](https://github.com/jmjac/tradeogre-api/actions/workflows/tests.yml)
 # tradeogre-api
 
 Simple wrapper for TradeOgre public API [WIP]
