@@ -1,7 +1,7 @@
 [![Tests](https://github.com/jmjac/tradeogre-api/actions/workflows/tests.yml/badge.svg)](https://github.com/jmjac/tradeogre-api/actions/workflows/tests.yml)
 # tradeogre-api
 
-Simple wrapper for TradeOgre public API [WIP]
+Go wrapper for TradeOgre public API
 
 Usage Example:
 ```go
